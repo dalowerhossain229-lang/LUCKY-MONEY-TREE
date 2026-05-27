@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LUCKY MONEY TREE SLOT</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 🎰 ক্যাসিনো হেডার প্যানেল -->
+    <div class="header">
+        <div class="brand">
+            <div class="name">MONEY TREE</div>
+            <div class="game">ASIAN WEALTH SLOT</div>
+        </div>
+        <div class="header-right">
+            <button class="sound-btn" id="mute-btn" onclick="toggleMute()">🔊</button>
+            <div class="balance-box">৳ <span id="user-balance">0.00</span></div>
+        </div>
+    </div>
+
+    <!-- 🌳 [৩-রিল ক্যানভাস স্লট মেশিন জোন] (ছবি ছাড়া পিউর ভেক্টর ভাই ভাই) -->
+    <div class="slot-machine-zone">
+        <div class="slot-window-frame">
+            <canvas id="slot-canvas" width="360" height="220"></canvas>
+        </div>
+    </div>
+
+    <!-- 🏆 ইন-লাইন লাইভ স্কোরিং মেসেজ বার -->
+    <div class="win-status-container" id="win-status-box">
+        <span id="win-text-msg">বাজি সিলেক্ট করে SPIN বোতাম চাপুন ভাই!</span>
+    </div>
+
+    <!-- 🎛️ কন্ট্রোল প্যানেল এরিয়া (৳১-৳২০০০ প্লাস-মাইনাস ও SPIN বোতাম পাশাপাশি লক ভাই) -->
+    <div class="footer-controls">
+        <div class="play-section">
+            <div class="bet-selector">
+                <button class="bet-btn-nav" onclick="adjustBet('minus')">−</button>
+                <div style="text-align: center; width: 60px;">
+                    <div style="font-size: 9px; color: #aaa; font-weight: bold;">BET</div>
+                    <div style="font-size: 15px; font-weight: 900; color: #fff;" id="bet-display">৳৫০</div>
+                </div>
+                <button class="bet-btn-nav" onclick="adjustBet('plus')">+</button>
+            </div>
+
+            <button class="play-btn" id="spin-btn" onclick="handleMoneyTreeSpin()">SPIN</button>
+
+            <div class="icon-group">
+                <button class="icon-btn" id="auto-btn" onclick="toggleAuto()">🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔌 [উইনগো কালার ট্রেড সিঙ্ক - ইউনিভার্সাল সকেট ইঞ্জিন লাইব্রেরি ভাই] -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlUserId = urlParams.get('userId') || urlParams.get('id') || urlParams.get('username') || "guest_user";
+        const urlWallet = urlParams.get('wallet') || "main";
+        
+        const SERVER_URL = window.location.origin;
+
+        const canvas = document.getElementById("slot-canvas");
+        const ctx = canvas.getContext("2d");
+
+        let balance = 0.00;
+        let currentBet = 50; 
+        let isSpinning = false; 
+        let isAuto = false;
+        let isMuted = false;
+        let autoInterval = null;
+
+        // 🌳✉️🪙🏮🍊 রাজকীয় এশিয়ান ফরচুন স্লট আইকন মেমোরি ম্যাপ ভাই ভাই
+        const iconSymbols = {
+            "TREE": "🌳", "ENVELOPE": "✉️", "COIN": "🪙", "LANTERN": "🏮", "ORANGE": "🍊"
+        };
+
+        // ৩টি রিলের লাইভ স্ক্রলিং পজিশন ও স্পিড কন্ট্রোলার
+        let reels = [
+            { symbols: ["🌳", "✉️", "🪙"], y: 0, speed: 0, targetY: 0 },
+            { symbols: ["✉️", "🪙", "🏮"], y: 0, speed: 0, targetY: 0 },
+            { symbols: ["🪙", "🏮", "🍊"], y: 0, speed: 0, targetY: 0 }
+        ];
+
+        const reelWidth = 100;
+        const reelHeight = 220;
+        const itemHeight = 70;
+        const startX = (canvas.width - (3 * reelWidth)) / 2;
+
+        function renderSlotMachine() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // ৩টি রিল ব্যাকগ্রাউন্ড গ্রিড পারফেক্ট ড্রয়িং ভাই ভাই
+            for (let i = 0; i < 3; i++) {
+                const rx = startX + (i * reelWidth);
+                
+                ctx.fillStyle = "#0f1524";
+                ctx.fillRect(rx, 0, reelWidth - 6, reelHeight);
+                ctx.strokeStyle = "#1b291d";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(rx, 0, reelWidth - 6, reelHeight);
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(rx, 0, reelWidth - 6, reelHeight);
+                ctx.clip();
+
+                const currentY = reels[i].y;
+                const totalItems = reels[i].symbols.length;
+
+                for (let j = -2; j < totalItems + 2; j++) {
+                    const index = (j + totalItems * 10) % totalItems;
+                    const sym = reels[i].symbols[index];
+                    const py = (j * itemHeight) + (currentY % itemHeight);
+
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "38px Arial";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    
+                    // আইকন গ্লো বুস্টার শ্যাডো ট্রিকস ভাই ভাই
+                    ctx.shadowColor = "#f1c40f";
+                    ctx.shadowBlur = isSpinning ? 8 : 0;
+                    ctx.fillText(sym, rx + (reelWidth - 6)/2, py + itemHeight/2);
+                    ctx.shadowBlur = 0;
+                }
+                ctx.restore();
+            }
+
+            // মাঝখানের গোল্ডেন উইন টার্গেট লাইন বর্ম ভাই ভাই
+            ctx.strokeStyle = "rgba(241, 196, 15, 0.75)";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(startX, canvas.height / 2);
+            ctx.lineTo(startX + (3 * reelWidth) - 6, canvas.height / 2);
+            ctx.stroke();
+        }
+
+        // 🧠 [৩-রিল হাই-স্পিড স্মুথ স্ক্রলিং এনিমেশন লুপ ইঞ্জিন ভাই ভাই]
+        function updateSlotAnimation() {
+            let stillSpinning = false;
+
+            for (let i = 0; i < 3; i++) {
+                if (reels[i].speed > 0.2) {
+                    reels[i].y += reels[i].speed;
+                    reels[i].speed *= 0.96; // স্মুথ ঘর্ষণ ব্রেক মেকানিজম ভাই ভাই
+                    stillSpinning = true;
+                } else if (reels[i].speed > 0) {
+                    reels[i].speed = 0;
+                    reels[i].y = reels[i].targetY;
+                    playAudio('click'); // 🚀 রিল লক হওয়ার খুটখুট সাউন্ড লক ভাই ভাই
+                }
+            }
+
+            renderSlotMachine();
+
+            if (stillSpinning) {
+                requestAnimationFrame(updateSlotAnimation);
+            } else {
+                isSpinning = false;
+                if (!isAuto) document.getElementById("spin-btn").disabled = false;
+            }
+        }
+
+        if (typeof io !== 'undefined') {
+            const socket = io();
+            socket.on("balanceUpdate", (data) => {
+                if (data && data.username === urlUserId) {
+                    if (window.parent) window.parent.postMessage({ action: "refresh_wallet" }, "*");
+                    fetchLiveBalance();
+                }
+            });
+        }
+
+        async function fetchLiveBalance() {
+            try {
+                const response = await fetch(`${SERVER_URL}/api/moneytree-balance?userId=${urlUserId}&wallet=${urlWallet}`);
+                const data = await response.json();
+                if (data && data.success) {
+                    balance = parseFloat(data.balance);
+                    document.getElementById("user-balance").innerText = balance.toFixed(2);
+                }
+            } catch (e) { console.error("Balance lag"); }
+        }
+
+        window.onload = () => {
+            if (window.parent) window.parent.postMessage({ action: "refresh_wallet" }, "*");
+            fetchLiveBalance();
+            renderSlotMachine();
+        };
+
+        function adjustBet(action) {
+            if (isSpinning) return;
+            if (action === 'minus' && currentBet > 1) {
+                if (currentBet <= 10) currentBet -= 1;
+                else if (currentBet <= 100) currentBet -= 10;
+                else currentBet -= 50;
+            }
+            if (action === 'plus' && currentBet < 2000) {
+                if (currentBet < 10) currentBet += 1;
+                else if (currentBet < 100) currentBet += 10;
+                else currentBet += 50;
+            }
+            if (currentBet < 1) currentBet = 1;
+            if (currentBet > 2000) currentBet = 2000;
+            
+            document.getElementById("bet-display").innerText = `৳${currentBet}`;
+            playAudio('click');
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById("mute-btn").innerText = isMuted ? "🔇" : "🔊";
+            document.getElementById("mute-btn").classList.toggle("muted-active", isMuted);
+        }
+
+                function toggleAuto() {
+            isAuto = !isAuto;
+            document.getElementById("auto-btn").classList.toggle("active", isAuto);
+            if (isAuto && !isSpinning) handleMoneyTreeSpin();
+            playAudio('click');
+        }
+
+        async function handleMoneyTreeSpin() {
+            if (isSpinning) return;
+
+            document.getElementById("win-status-box").className = "win-status-container";
+            document.getElementById("win-text-msg").innerText = "🌳 রিল শোঁ শোঁ করে ঘুরছে...";
+
+            isSpinning = true;
+            document.getElementById("spin-btn").disabled = true;
+            
+            playAudio('click');
+            playAudio('spin'); // 🚀 রিল ওড়ার কড়া ক্যাসিনো spin2.mp3 সাউন্ড ফায়ার লক ভাই!
+
+            // ফ্রন্টএন্ডে ৩টি রিল এক টানা স্পিডে স্ক্রলিং এনিমেশন মোড চালু ভাই ভাই
+            reels.forEach(r => {
+                r.speed = 16 + (Math.random() * 8); // ডাইনামিক র্যান্ডম স্পিড রান ভাই ভাই
+            });
+            requestAnimationFrame(updateSlotAnimation);
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/moneytree-spin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: urlUserId,
+                        amount: parseFloat(currentBet),
+                        wallet: urlWallet
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data && data.success === true) {
+                    balance = parseFloat(data.balance);
+                    if (window.parent) window.parent.postMessage({ action: "refresh_wallet" }, "*");
+                    if (window.top) window.top.postMessage({ action: "refresh_wallet" }, "*");
+
+                    // 🎯 [রিল স্টপিং ফিজিক্স গাইড চাবি]: ব্যাকএন্ডের নিয়ন প্রতীক তালিকায় ৩টি রিলকে এক লাইনে এলাইন লক!
+                    setTimeout(() => {
+                        reels[0].symbols = [iconSymbols[data.reel1], "🌳", "✉️"]; reels[0].targetY = 0;
+                    }, 1000);
+
+                    setTimeout(() => {
+                        reels[1].symbols = [iconSymbols[data.reel2], "✉️", "🪙"]; reels[1].targetY = 0;
+                    }, 1400);
+
+                    setTimeout(() => {
+                        reels[2].symbols = [iconSymbols[data.reel3], "🪙", "🏮"]; reels[2].targetY = 0;
+                        
+                        // ৩টি রিল সম্পূর্ণ স্টপ হওয়ার পর ফাইনাল প্রফিট শোডাউন হবে ভাই ভাই
+                        setTimeout(() => {
+                            showFinalReward(data.status, data.winAmount, data.combination);
+                        }, 500);
+                    }, 1800);
+
+                } else {
+                    alert(data.message || "❌ Insufficient Balance! Please Recharge.");
+                    stopSlotState();
+                }
+            } catch (err) {
+                alert("⚠️ সেশন আউট! আবার SPIN বোতাম চাপুন ভাই ভাই।");
+                stopSlotState();
+            }
+        }
+
+        function showFinalReward(status, winAmount, combination) {
+            const msgBox = document.getElementById("win-status-box");
+            const textMsg = document.getElementById("win-text-msg");
+
+            if (status === "win") {
+                if (winAmount >= (currentBet * 4)) {
+                    playAudio('bigwin'); // 🚀 ৪ গুণের বেশি টাকার গাছের ৩-চিহ্ন মেগা জ্যাকপট মিললে bigwin1.mp3 ভাই ভাই
+                } else {
+                    playAudio('win'); // 🚀 সাধারণ লাইন ২-চিহ্ন প্রফিট উইন হলে win2.mp3 ভাই ভাই
+                }
+                msgBox.className = "win-status-container win-glow-bar";
+                textMsg.innerText = `🏆 মেগা উইন!! কম্বো মিলেছে: [${combination}] (৳${winAmount})`;
+            } else {
+                playAudio('wheel'); // 🚀 ৩টি ঘর অমিল বা লস হলে wheel1.mp3 ব্যাকআপ সাউন্ড ফায়ার লক!
+                msgBox.className = "win-status-container lose-glow-bar";
+                textMsg.innerText = "❌ ওহ! এই রাউন্ডে রিল মেলেনি। আবার ট্রাই করুন ভাই ভাই!";
+            }
+
+            document.getElementById("user-balance").innerText = balance.toFixed(2);
+            stopSlotState();
+
+            if (isAuto) {
+                autoInterval = setTimeout(() => {
+                    if (isAuto) handleMoneyTreeSpin();
+                }, 2000);
+            }
+        }
+
+        function stopSlotState() {
+            isSpinning = false;
+            document.getElementById("spin-btn").disabled = false;
+            if (!isAuto && autoInterval) clearTimeout(autoInterval);
+        }
+
+        // 🎯 [৫টি প্রিমিয়াম সাউন্ড ও বাফার গেটওয়ে লক ভাই ভাই]
+        const slotSounds = {
+            click: new Audio('click2.mp3'),   // 🚀 বাটন ক্লিক
+            spin: new Audio('spin2.mp3'),     // 🚀 শোঁ শোঁ রিল ঘূর্ণন সাউন্ড
+            win: new Audio('win2.mp3'),       // 🚀 নরমাল লাইন উইন
+            bigwin: new Audio('bigwin1.mp3'), // 🚀 মেগা জ্যাকপট ব্লাস্ট
+            wheel: new Audio('wheel1.mp3')    // 🚀 লস ব্যাকআপ সাউন্ড
+        };
+        Object.values(slotSounds).forEach(s => s.load());
+
+        function playAudio(type) { 
+            if (isMuted) return; // 🔇 সাউন্ড অফ থাকলে কোনো অডিও প্লে হবে না ভাই ভাই!
+            try { 
+                slotSounds[type].currentTime = 0; 
+                slotSounds[type].play(); 
+            } catch(e){} 
+        }
+    </script>
+</body>
+</html>
+
