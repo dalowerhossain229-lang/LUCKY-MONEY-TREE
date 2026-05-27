@@ -25,7 +25,7 @@ app.use((req, res, next) => {
 });
 
 // 🎰 [উইনগো কালার ট্রেড ওরিজিনাল ডোমেইন সিঙ্ক]
-const MAIN_SITE_URL = "https://onrender.com"; 
+const MAIN_SITE_URL = "https://betlover247.onrender.com"; 
 
 // 🌳✉️🪙🏮🍊 ওরিজিনাল ৫টি নিয়ন চিহ্নের লাক্সারি স্লট পুল তালিকা ভাই ভাই
 const slotSymbolsPool = ["TREE", "ENVELOPE", "COIN", "LANTERN", "ORANGE"];
