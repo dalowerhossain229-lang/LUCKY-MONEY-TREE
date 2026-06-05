@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MONEY TREE - NEON COIN CRASH KING</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 🎨 লাইভ ক্র্যাশ এরিনা সিএসএস ফ্রেম ইনজেকশন ভাই ভাই */
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #05070c; font-family: 'Segoe UI', Roboto, sans-serif; color: #fff; -webkit-tap-highlight-color: transparent; user-select: none; }
+        .header { display: none !important; } 
+        
+        body { 
+            background: radial-gradient(circle at center, #111e36 0%, #04060a 100%); 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            height: 100vh; 
+        }
+
+        /* 🏟️ মেইন গোল্ডেন মানি ট্রি ক্যানভাস সারফেসWrapper */
+        .tree-canvas-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            height: 320px;
+            margin: 10px auto 0 auto;
+            background: linear-gradient(180deg, #0a101d 0%, #05080f 100%);
+            border: 3px solid #ffcc00;
+            border-radius: 24px;
+            box-shadow: 0 0 25px rgba(255,204,0,0.2), inset 0 0 20px rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        /* 📈 লাইভ ক্র্যাশ মাল্টিপ্লায়ার নিওন টেক্সট ডিসপ্লে */
+        .multiplier-display-node {
+            font-size: 42px;
+            font-weight: 900;
+            color: #38bdf8;
+            text-shadow: 0 0 20px rgba(56,189,248,0.6);
+            margin-bottom: 15px;
+            font-family: monospace;
+        }
+        .multiplier-display-node.crashed-state {
+            color: #ff3366 !important;
+            text-shadow: 0 0 20px rgba(255,51,102,0.6) !important;
+            animation: shakeGlow 0.3s ease-in-out infinite;
+        }
+
+        @keyframes shakeGlow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        /* 🌳 ওরিজিনাল মানি ট্রি এনিমেশন ফ্রেম */
+        .money-tree-svg-box {
+            width: 110px;
+            height: 110px;
+            transition: all 0.15s ease;
+        }
+        .money-tree-svg-box img { width: 100%; height: 100%; object-fit: contain; }
+
+        /* 📢 লাইভ মেসেজ প্যানেল বার */
+        .win-status-container { position: relative; z-index: 10; text-align: center; padding: 10px; margin: 4px 12px; background: rgba(9, 12, 18, 0.6); border-radius: 10px; border: 1px solid rgba(255,255,255,0.02); }
+        #win-text-msg { font-size: 12px; font-weight: 700; color: #38bdf8; letter-spacing: 0.3px; }
+
+        /* 🎛️ নিচের মেইন গেম কন্ট্রোল প্যানেল ফুটার (১৫ পিক্সেল ওপরে লিফটিং সুপ্রিম লক) */
+        .footer-controls { position: relative; z-index: 50; background: #07090e; border-top: 1px solid #161b29; padding: 15px 15px 38px 15px; box-shadow: 0 -8px 25px rgba(0,0,0,0.7); }
+        .play-section { display: flex; justify-content: space-between; align-items: center; gap: 10px; max-width: 450px; margin: 0 auto; margin-bottom: 25px; }
+        .bet-btn-nav { background: #111522; border: 1px solid #20293d; color: #ffaa00; font-size: 18px; font-weight: 800; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        /* 🚀 প্লে ও ক্যাশআউট ডাইনামিক কম্বো বোতাম বর্ম */
+        .play-btn { flex: 1; background: linear-gradient(180deg, #ffbb00 0%, #d48800 100%); color: #000; font-size: 16px; font-weight: 900; border: none; padding: 12px 0; border-radius: 10px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(212,136,0,0.3); }
+        .play-btn.cashout-active-mode { background: linear-gradient(180deg, #22c55e 0%, #15803d 100%) !important; color: #fff !important; box-shadow: 0 4px 15px rgba(34,197,94,0.4) !important; }
+        .play-btn:disabled { background: #141721 !important; border-color: #1f2536 !important; color: #4b5563 !important; box-shadow: none !important; cursor: not-allowed; }
+        
+        .icon-btn { background: #111522; border: 1px solid #20293d; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #ffaa00; font-weight: bold; }
+        .icon-btn.active { background: #ffaa00; color: #000; box-shadow: 0 0 10px rgba(255,170,0,0.4); }
+
+        .win-glow-bar { border-color: rgba(0, 255, 136, 0.4) !important; background: rgba(0, 255, 136, 0.05) !important; }
+        .win-glow-bar #win-text-msg { color: #00ff88 !important; }
+        .lose-glow-bar { border-color: rgba(255, 51, 102, 0.4) !important; background: rgba(255, 51, 102, 0.05) !important; }
+        .lose-glow-bar #win-text-msg { color: #ff3366 !important; }
+    </style>
+</head>
+<body>
+
+    <div class="header" style="display:none !important;">
+        <div class="balance-box">৳ <span id="user-balance">0.00</span></div>
+    </div>
+
+    <!-- 🏟️ মেইন গোল্ডেন মানি ট্রি ক্যানভাস সারফেসWrapper -->
+    <div class="tree-canvas-wrapper">
+        <div class="multiplier-display-node" id="live-multiplier-text">x1.00</div>
+        <div class="money-tree-svg-box" id="money-tree-anim-node">
+            <!-- 🎯 সরাসরি আপনার রুট ফোল্ডারে থাকা ওরিজিনাল গাছের ছবি সিঙ্ক লক ওস্তাদ! -->
+            <img src="money-tree.png" alt="Money Tree">
+        </div>
+    </div>
+
+    <!-- 📢 উইন-লস লাইভ ক্যাসিনো মেসেজ প্যানেল বার -->
+    <div class="win-status-container" id="win-status-box">
+        <span id="win-text-msg">বাজি সিলেক্ট করে BET বোতাম চাপুন ওস্তাদ!</span>
+    </div>
+
+    <!-- 🎛️ অ্যাকশন কন্ট্রোল ফুটার প্যানেল বার -->
+    <div class="footer-controls">
+        <div class="play-section">
+            <button class="bet-btn-nav" onclick="adjustBet('minus')">-</button>
+            <div style="text-align: center; width: 65px;">
+                <div style="font-size: 9px; color: #aaa; font-weight: bold;">BET</div>
+                <div style="font-size: 15px; font-weight: 900; color: #fff;" id="bet-display">৳১০</div>
+            </div>
+            <button class="bet-btn-nav" onclick="adjustBet('plus')">+</button>
+
+            <button class="play-btn" id="spin-btn" onclick="handleMoneyTreeMainAction()">BET</button>
+            
+            <div class="icon-group">
+                <button class="icon-btn" id="auto-btn" onclick="toggleAuto()">🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlUserId = urlParams.get('userId') || urlParams.get('id') || urlParams.get('username') || "guest_user";
+        const urlWallet = urlParams.get('wallet') || "main";
+        const SERVER_URL = window.location.origin;
+
+        let balance = 0.00;
+        let currentBet = 10;
+        let gameState = "IDLE"; // IDLE, RUNNING, CRASHED
+        let isAuto = false;
+        let autoInterval = null;
+
+        let liveTickMultiplier = 1.00;
+        let serverTargetCrashPoint = 1.00;
+        let clockTickInterval = null;
+
+                function adjustBet(action) {
+            if (gameState === "RUNNING") return;
+            if (action === 'minus' && currentBet > 10) currentBet -= 10;
+            if (action === 'plus' && currentBet < 20000) currentBet += 10;
+            document.getElementById("bet-display").innerText = `৳${currentBet}`;
+            playAudio('click');
+        }
+
+        // 🚀 মেইন কন্ট্রোল বাটন ইন্টারসেপ্টর (একই বোতাম ওয়ান-শটে BET এবং CASH OUT সুইচার লক!)
+        function handleMoneyTreeMainAction() {
+            if (gameState === "IDLE") {
+                triggerMoneyTreeRoundBet();
+            } else if (gameState === "RUNNING") {
+                triggerMoneyTreePlayerCashout();
+            }
+            playAudio('click');
+        }
+
+        async function triggerMoneyTreeRoundBet() {
+            gameState = "RUNNING";
+            const mainBtn = document.getElementById("spin-btn");
+            mainBtn.innerText = "CASH OUT";
+            mainBtn.classList.add("cashout-active-mode");
+
+            document.getElementById("win-status-box").className = "win-status-container";
+            document.getElementById("win-text-msg").innerText = "💸 গাছ থেকে নিওন সোনার কয়েন উড়ছে! ক্র্যাশ হওয়ার আগে ক্যাশআউট মারুন ওস্তাদ...";
+            
+            const textNode = document.getElementById("live-multiplier-text");
+            textNode.className = "multiplier-display-node";
+            textNode.innerText = "x1.00";
+
+            const treeImg = document.getElementById("money-tree-anim-node");
+            treeImg.style.transform = "scale(1)";
+
+            liveTickMultiplier = 1.00;
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/moneytree-bet`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: urlUserId, amount: parseFloat(currentBet), wallet: urlWallet })
+                });
+
+                const serverRes = await response.json();
+                
+                if (serverRes.success || serverRes.success === true) {
+                    serverTargetCrashPoint = parseFloat(serverRes.gameData.crashMultiplier);
+                    runMoneyTreeLiveTickerLoop();
+                } else {
+                    alert(serverRes.message || "❌ বাজি রিজেক্টেড! ওয়ালেটে বাজি ধরার টাকা নাই ওস্তাদ।");
+                    resetMoneyTreeToIdle();
+                }
+            } catch (err) {
+                resetMoneyTreeToIdle();
+            }
+        }
+
+        // 📈 [🎰 ওরিজিনাল ক্র্যাশ নিওন মাল্টিপ্লায়ার স্পীড ড্রাইভার লুপ ইঞ্জিন]
+        function runMoneyTreeLiveTickerLoop() {
+            playAudio('spin');
+            let baseSpeed = 80; // মিলি-সেকেন্ড টিক রেশিও
+
+            clockTickInterval = setInterval(() => {
+                if (liveTickMultiplier < serverTargetCrashPoint) {
+                    // মাল্টিপ্লায়ার যত ওপরে উঠবে, স্পীড তত ডাইনামিক মাল্টিপ্লাই হবে ওস্তাদ!
+                    let speedFactor = 0.01;
+                    if (liveTickMultiplier > 5.00) speedFactor = 0.08;
+                    else if (liveTickMultiplier > 2.00) speedFactor = 0.03;
+
+                    liveTickMultiplier = parseFloat((liveTickMultiplier + speedFactor).toFixed(2));
+                    document.getElementById("live-multiplier-text").innerText = `x${liveTickMultiplier.toFixed(2)}`;
+
+                    // গাছ হালকা দুলুনি এনিমেশন স্কেলিং লক চ্যাম
+                    let scalePulse = 1 + (liveTickMultiplier * 0.005);
+                    if (scalePulse > 1.3) scalePulse = 1.3;
+                    document.getElementById("money-tree-anim-node").style.transform = `scale(${scalePulse})`;
+                } else {
+                    // 💥 কাটায় কাটায় টার্গেট পয়েন্টে আসতেই মেগা ক্র্যাশ ফায়ার লক!
+                    clearInterval(clockTickInterval);
+                    triggerMoneyTreeCrashFinalStatus();
+                }
+            }, baseSpeed);
+        }
+
+        async function triggerMoneyTreePlayerCashout() {
+            if (gameState !== "RUNNING") return;
+            clearInterval(clockTickInterval);
+            gameState = "IDLE";
+
+            let finalCashoutMult = liveTickMultiplier;
+            const textMsg = document.getElementById("win-text-msg");
+            const msgBox = document.getElementById("win-status-box");
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/moneytree-cashout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: urlUserId, betAmount: currentBet, wallet: urlWallet, cashoutMultiplier: finalCashoutMult
+                    })
+                });
+
+                const resData = await response.json();
+                if (resData.success) {
+                    playAudio('win');
+                    msgBox.className = "win-status-container win-glow-bar";
+                    textMsg.innerHTML = `🎉 মেগা ক্যাশআউট সাকসেস! আপনি <b>${finalCashoutMult}X</b> এ টাকা তুলেছেন এবং ৳${resData.winAmount} ওয়ালেটে যোগ হয়েছে ওস্তাদ ভাই ভাই!`;
+                    balance = parseFloat(resData.balance);
+                    document.getElementById("user-balance").innerText = balance.toFixed(2);
+                }
+            } catch (e) {}
+
+            setTimeout(() => { finishMoneyTreeRoundCleanState(); }, 1500);
+        }
+
+        async function triggerMoneyTreeCrashFinalStatus() {
+            gameState = "CRASHED";
+            playAudio('wheel');
+
+            const textNode = document.getElementById("live-multiplier-text");
+            textNode.className = "multiplier-display-node crashed-state";
+            textNode.innerText = `CRASHED @ x${serverTargetCrashPoint.toFixed(2)}`;
+
+            const msgBox = document.getElementById("win-status-box");
+            msgBox.className = "win-status-container lose-glow-bar";
+            document.getElementById("win-text-msg").innerText = "❌ গাছ থেকে সব কয়েন ঝরে পড়েছে! বাজি সম্পূর্ণ লস ভাই ভাই!";
+
+            // লস হিস্ট্রি এপিআই নোড ব্যাকগ্রাউন্ডে এক শটে ফায়ার লক
+            await fetch(`${SERVER_URL}/api/moneytree-lose`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: urlUserId, betAmount: currentBet, wallet: urlWallet })
+            });
+
+            setTimeout(() => { finishMoneyTreeRoundCleanState(); }, 2500);
+        }
+
+        function finishMoneyTreeRoundCleanState() {
+            resetMoneyTreeToIdle();
+            if (isAuto) {
+                autoInterval = setTimeout(() => {
+                    if (isAuto && gameState === "IDLE") triggerMoneyTreeRoundBet();
+                }, 3000);
+            }
+        }
+
+        function resetMoneyTreeToIdle() {
+            gameState = "IDLE";
+            const mainBtn = document.getElementById("spin-btn");
+            if (mainBtn) {
+                mainBtn.disabled = false;
+                mainBtn.innerText = "BET";
+                mainBtn.className = "play-btn";
+            }
+            if (clockTickInterval) clearInterval(clockTickInterval);
+        }
+
+        if (typeof io !== 'undefined') {
+            const socket = io();
+            socket.on("balanceUpdate", (data) => {
+                if (data && data.username === urlUserId) {
+                    if (data.balance !== undefined) {
+                        balance = parseFloat(data.balance);
+                        if (document.getElementById("user-balance")) {
+                            document.getElementById("user-balance").innerText = balance.toFixed(2);
+                        }
+                    }
+                    if (window.parent) window.parent.postMessage({ action: "refresh_wallet" }, "*");
+                }
+            });
+        }
+
+        async function fetchLiveBalance() {
+            try {
+                const response = await fetch(`${SERVER_URL}/api/moneytree-balance?userId=${urlUserId}&wallet=${urlWallet}`);
+                const serverData = await response.json();
+                if (serverData.success || serverData.balance !== undefined) {
+                    balance = parseFloat(serverData.balance);
+                    if (document.getElementById("user-balance")) {
+                        document.getElementById("user-balance").innerText = balance.toFixed(2);
+                    }
+                }
+            } catch (e) {}
+        }
+
+        window.onload = () => {
+            if (window.parent) window.parent.postMessage({ action: "refresh_wallet" }, "*");
+            fetchLiveBalance();
+        };
+
+        function toggleAuto() {
+            isAuto = !isAuto;
+            const autoEl = document.getElementById("auto-btn");
+            if (autoEl) autoEl.classList.toggle('active', isAuto);
+            if (isAuto && gameState === "IDLE") triggerMoneyTreeRoundBet();
+            playAudio('click');
+        }
+
+        const slotSounds = {
+            click: new Audio('spin2.mp3'), spin: new Audio('spin2.mp3'),
+            win: new Audio('win2.mp3'), wheel: new Audio('spin2.mp3')
+        };
+        Object.values(slotSounds).forEach(s => s.load());
+
+        function playAudio(type) {
+            try { slotSounds[type].currentTime = 0; slotSounds[type].play(); } catch(e) {}
+        }
+    </script>
+</body>
+</html>
+
+
